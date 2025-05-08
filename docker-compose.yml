@@ -1,0 +1,123 @@
+version: '3.8'
+
+services:
+  # FastAPI Backend Service
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: stockpredictpro-api
+    container_name: stockpredictpro-api
+    restart: unless-stopped
+    ports:
+      - "8000:8000"  # FastAPI port
+    volumes:
+      - ./app:/app/app  # For development, mount the app directory
+      - ./.env:/app/.env  # Mount the environment file
+    environment:
+      - CONTAINER_TYPE=api
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres_password}@db:5432/${POSTGRES_DB:-stockpredictpro}
+      - SECRET_KEY=${SECRET_KEY}
+      - STRIPE_API_KEY=${STRIPE_API_KEY:-}
+      - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET:-}
+      - REDIS_URL=redis://redis:6379/0
+      - ENV=production
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - stockpredictpro-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Streamlit Frontend Service
+  streamlit:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: stockpredictpro-streamlit
+    container_name: stockpredictpro-streamlit
+    restart: unless-stopped
+    ports:
+      - "8501:8501"  # Streamlit port
+    volumes:
+      - ./app:/app/app  # For development, mount the app directory
+      - ./.env:/app/.env  # Mount the environment file
+    environment:
+      - CONTAINER_TYPE=streamlit
+      - API_URL=http://api:8000/api/v1
+      - ENV=production
+    depends_on:
+      - api
+    networks:
+      - stockpredictpro-network
+
+  # PostgreSQL Database Service
+  db:
+    image: postgres:13-alpine
+    container_name: stockpredictpro-db
+    restart: unless-stopped
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres_password}
+      - POSTGRES_DB=${POSTGRES_DB:-stockpredictpro}
+    ports:
+      - "5432:5432"
+    networks:
+      - stockpredictpro-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache Service
+  redis:
+    image: redis:6-alpine
+    container_name: stockpredictpro-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - stockpredictpro-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Nginx Service for Production Deployment
+  nginx:
+    image: nginx:1.21-alpine
+    container_name: stockpredictpro-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"  # HTTP
+      - "443:443"  # HTTPS
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./nginx/certs:/etc/nginx/certs
+      - ./nginx/html:/usr/share/nginx/html
+    depends_on:
+      - api
+      - streamlit
+    networks:
+      - stockpredictpro-network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  stockpredictpro-network:
+    driver: bridge

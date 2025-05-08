@@ -1,0 +1,120 @@
+/* Custom CSS for StockPredictPro */
+
+/* Main header styling */
+.main-header {
+    color: #4ecca3;
+    text-align: center;
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+
+/* Sub header styling */
+.sub-header {
+    color: #1f4068;
+    border-bottom: 2px solid #4ecca3;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Card styling */
+.card {
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    background-color: #f8f9fa;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Button styling */
+.custom-button {
+    background-color: #4ecca3;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 0.5rem 1rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.custom-button:hover {
+    background-color: #3bba90;
+}
+
+/* Table styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+table th {
+    background-color: #1f4068;
+    color: white;
+    padding: 0.5rem;
+    text-align: left;
+}
+
+table td {
+    padding: 0.5rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+table tr:hover {
+    background-color: #f2f2f2;
+}
+
+/* KPI metrics styling */
+.metric-value {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 0.25rem;
+}
+
+.metric-label {
+    font-size: 1rem;
+    color: #6c757d;
+}
+
+/* Profit/Loss indicators */
+.profit {
+    color: #28a745;
+}
+
+.loss {
+    color: #dc3545;
+}
+
+/* Logo styling in navbar */
+.app-logo {
+    max-height: 60px;
+    margin-right: 1rem;
+}
+
+/* Custom navbar */
+.navbar {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    background-color: #162447;
+    color: white;
+    margin-bottom: 2rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .main-header {
+        font-size: 1.8rem;
+    }
+    
+    .metric-value {
+        font-size: 1.5rem;
+    }
+    
+    .navbar {
+        flex-direction: column;
+    }
+    
+    .app-logo {
+        margin-bottom: 1rem;
+    }
+}
