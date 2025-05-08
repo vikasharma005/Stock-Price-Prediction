@@ -16,8 +16,8 @@ services:
       - ./.env:/app/.env  # Mount the environment file
     environment:
       - CONTAINER_TYPE=api
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/stockpredictpro
-      - SECRET_KEY=${SECRET_KEY:-your-secret-key-for-development-only}
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres_password}@db:5432/${POSTGRES_DB:-stockpredictpro}
+      - SECRET_KEY=${SECRET_KEY}
       - STRIPE_API_KEY=${STRIPE_API_KEY:-}
       - STRIPE_WEBHOOK_SECRET=${STRIPE_WEBHOOK_SECRET:-}
       - REDIS_URL=redis://redis:6379/0
@@ -65,9 +65,9 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=stockpredictpro
+      - POSTGRES_USER=${POSTGRES_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres_password}
+      - POSTGRES_DB=${POSTGRES_DB:-stockpredictpro}
     ports:
       - "5432:5432"
     networks:
